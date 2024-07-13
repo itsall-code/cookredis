@@ -3,3 +3,4 @@
 
 # 忽略pytho的缓存文件
 __pycache__/
+__pycache__/*
