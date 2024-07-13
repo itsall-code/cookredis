@@ -8,7 +8,7 @@ client.create_connection()
 # 读取键名为 'user' 的所有数据
 data = client.get_data('user')
 # 初始化处理类
-process_data = process.Process(data, 2, 4)
+process_data = process.Process(data, 2, 4, 'local_')
 process_data.get_keys()
 process_data.get_values()
 

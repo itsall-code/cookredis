@@ -11,6 +11,16 @@ class Json:
             self.json_data = json.load(file)
         return self.json_data
 
+    # 获取redsi配置
+    def get_redis(self):
+        self.redis_data = self.json_data['redis']
+        return self.redis_data
+
+    # 获取serer配置
+    def get_server(self):
+        self.server_data = self.json_data['server']
+        return self.server_data
+
     # 打印Json文件内容
     def out_data(self):
         formatted_json = json.dumps(self.json_data, indent=4)
@@ -19,8 +29,11 @@ class Json:
 
 # 使用示例
 if __name__ == '__main__':
-    file_path = '../cfg/local_db_cfg.json'
+    file_path = '../cfg/new_local_db_cfg.json'
     local_json = Json(file_path)
     json_data = local_json.read_json_file()
-    print(f"{json_data['host']}")
+    redis_data = json_data['redis']
+    print(f"{redis_data['host']}")
+    print(f"{local_json.get_redis()}")
+    print(f"{local_json.get_server()}")
     local_json.out_data()

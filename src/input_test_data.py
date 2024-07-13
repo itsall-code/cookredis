@@ -1,7 +1,7 @@
 import redis
 
 # 创建 Redis 连接
-redis_client = redis.Redis(host='localhost', port=6379, db=1)
+redis_client = redis.Redis(host='localhost', port=6379, db=2)
 
 # 要存储的数据
 data = {
@@ -15,10 +15,8 @@ data = {
 replicated_data = {key + b'_%d' % i: value for i in range(123456) for key, value in data.items()}
 len(replicated_data)
 
-
 # 存储数据
-redis_client.delete('user')
-redis_client.hset('user', mapping=replicated_data)
+redis_client.delete('Account')
+redis_client.hset('Account', mapping=replicated_data)
 
 print("数据已成功存储到Redis.")
-

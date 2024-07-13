@@ -1,7 +1,0 @@
-{
-    "host": "local_host",
-    "port": 6379,
-    "pwd": None,
-    "db": 2
-}
-

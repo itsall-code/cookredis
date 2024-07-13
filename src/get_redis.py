@@ -3,12 +3,12 @@ import msgpack
 from redis import ConnectionPool
 
 class Get_redis:
-    def __init__(self, host='localhost', port=6379, password=None, db=0):
+    def __init__(self, host, port, db, password):
         self.connection_pool = ConnectionPool(
             host=host,
             port=port,
-            password=password,
-            db=db
+            db=db,
+            password=password
         )
         self.client = redis.Redis(connection_pool=self.connection_pool)
 
@@ -56,6 +56,12 @@ class Get_redis:
         except redis.RedisError as e:
             print(f"更新失败: {e}")
             return {}
+
+    def deleta_key(self, key):
+        self.client.delete(key)
+
+    def delete_db(self):
+        self.client.flushdb()
 
 if __name__ == '__main__':
     redis_client = GetRedis("localhost", 6379, None, 1)
