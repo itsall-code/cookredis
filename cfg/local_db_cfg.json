@@ -1,0 +1,8 @@
+{
+    "host": "local_host",
+    "port": 6379,
+    "pwd": null,
+    "db": 1，
+    "primary_key": "user"
+}
+
