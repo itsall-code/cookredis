@@ -1,0 +1,5 @@
+# 忽略vim的swp文件
+*swp
+
+# 忽略pytho的缓存文件
+__pycahe__/
