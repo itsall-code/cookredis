@@ -1,7 +1,5 @@
-import get_redis
+import redis
 
-
-class 
 # 创建连接到数据库 1 的 Redis 客户端
 source_redis = redis.Redis(host='localhost', port=6379, db=1)
 

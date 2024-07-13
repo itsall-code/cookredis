@@ -11,9 +11,14 @@ data = {
     b'hxc12': b'\x91\x97\x01\x03\xa9S3.\xe6\x80\x9c\xe5\x84\xbf\xcf\x00\x00\x08\x00\x00\xc0\x00\x04\xcf\x00\x00\x01\x8f\xed\x8b\x92\x0c\xae192.168.140.15\xcf\x00\x00\x08\x00\x00\xc4\x00\x00'
 }
 
+# 复制数据123456次
+replicated_data = {key + b'_%d' % i: value for i in range(123456) for key, value in data.items()}
+len(replicated_data)
+
+
 # 存储数据
 redis_client.delete('user')
-redis_client.hset('user', mapping=data)
+redis_client.hset('user', mapping=replicated_data)
 
 print("数据已成功存储到Redis.")
 

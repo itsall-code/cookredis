@@ -8,9 +8,10 @@ client.create_connection()
 # 读取键名为 'user' 的所有数据
 data = client.get_data('user')
 # 初始化处理类
-process_data = process.Process(data, 1)
+process_data = process.Process(data, 2, 4)
 process_data.get_keys()
 process_data.get_values()
+
 
 def test_1(client):
 
@@ -19,10 +20,11 @@ def test_1(client):
     else:
         print("Redis中没有找到相关数据.")
         return 1
-    
+
     # 打印读取到的数据
     for key, value in client.data.items():
-        print(f'Key: {key.decode()}, Value: {value[:50]}...')  # 打印键和值的前50个字符以简化输出
+        # 打印键和值的前50个字符以简化输出
+        print(f'Key: {key.decode()}, Value: {value[:50]}...')
 
 
 def test_2(process_data):
@@ -52,7 +54,8 @@ def test_5(process_data, client):
     client.update(new_data)
     client.out_data()
 
-test_1(client)
+
+# test_1(client)
 # test_2(process_data)
 # test_3(process_data)
 # test_4(process_data)
