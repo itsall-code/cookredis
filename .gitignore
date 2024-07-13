@@ -2,4 +2,4 @@
 *swp
 
 # 忽略pytho的缓存文件
-__pycahe__/
+__pycache__/
