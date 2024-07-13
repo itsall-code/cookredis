@@ -6,6 +6,9 @@
 	"password": null
     ],
     "server": [
-
-    ]
+	"platform": 1,
+	"group": 1
+    ],
+    "account": "Account",
+    "preLogin": "local"
 }
