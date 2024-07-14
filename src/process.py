@@ -2,7 +2,10 @@ import msgpack
 import re
 
 
-class Process:
+# 数据处理器类
+# 接受参数 原数据、服务器平台、服务器组号、本地服登陆前缀
+class Processi:
+    # 类初始化
     def __init__(self, data, platform, group, preLogin):
         self.original_data = data
         self.platform = platform
@@ -12,16 +15,19 @@ class Process:
         self.server_name = f"S{group}."
         self.preLogin = preLogin
 
+    # 获取keys
     def get_keys(self):
         return self.keys
-
+    # 获取values
     def get_values(self):
         return self.values
 
+    # 把原数据的keys 本地化加上登陆前缀
     def get_local_keys(self):
         local_keys = [self.preLogin + key if not key.startswith(self.preLogin) else key for key in self.keys]
         return local_keys
 
+    # 修改原数据的values, 修改服务器平台与组号、名称标识SX.
     def get_local_values(self):
         local_values = [
             [
@@ -30,7 +36,8 @@ class Process:
             ] for sublist in self.values
         ]
         return [msgpack.packb(value) for value in local_values]
-
+    
+    # 把修改好的数据打包为hash
     def get_hash_data(self):
         local_keys = self.get_local_keys()
         local_values = self.get_local_values()

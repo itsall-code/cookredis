@@ -1,6 +1,8 @@
 import json
 
 
+# 读取json 配置类
+# 接受配置文件的路径
 class Json:
     def __init__(self, file_path):
         self.path = file_path
@@ -27,7 +29,7 @@ class Json:
         print(formatted_json)
 
 
-# 使用示例
+# 测试
 if __name__ == '__main__':
     file_path = '../cfg/new_local_db_cfg.json'
     local_json = Json(file_path)
