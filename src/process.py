@@ -4,7 +4,7 @@ import re
 
 # 数据处理器类
 # 接受参数 原数据、服务器平台、服务器组号、本地服登陆前缀
-class Processi:
+class Process:
     # 类初始化
     def __init__(self, data, platform, group, preLogin):
         self.original_data = data
@@ -18,6 +18,7 @@ class Processi:
     # 获取keys
     def get_keys(self):
         return self.keys
+
     # 获取values
     def get_values(self):
         return self.values

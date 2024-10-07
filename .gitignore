@@ -1,6 +1,13 @@
-# 忽略vim的swp文件
+# 忽略vim 的swp文件
 *swp
 
-# 忽略pytho的缓存文件
+# 忽略python 的缓存文件
 __pycache__/
 __pycache__/*
+
+# 忽略pipeline 中的流水线配置
+./pipeline/*
+
+# 忽略cfg 中的配置
+./cfg/*
+

@@ -1,0 +1,14 @@
+{
+    "redis": {
+	"host": "localhost",
+	"port": 6379,
+	"db": 233,
+	"password": null
+    },
+    "server": {
+	"platform": 1,
+	"group": 1
+    },
+    "account": "Account",
+    "preLogin": "yhzr2_"
+}

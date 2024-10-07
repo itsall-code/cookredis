@@ -78,6 +78,9 @@ class Get_redis:
     # 备份
     # 接受需要到导入的Redis连接，与管道的最大处理数量
     def back_up(self, local_client, batch_size=1000):
+        # 清库
+        local_client.delete_db()
+        # 
         keys = self.client.keys('*')
         total_keys = len(keys)
         print(f"开始备份，共 {total_keys} 个键")
@@ -104,7 +107,7 @@ class Get_redis:
         self.client.flushdb()
 
 if __name__ == '__main__':
-    redis_client = GetRedis("localhost", 6379, None, 1)
+    redis_client = Get_redis("localhost", 6379, None, 1)
     redis_client.create_connection()
     data = redis_client.get_data("user")
     redis_client.out_data(data)
