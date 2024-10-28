@@ -58,6 +58,16 @@ def get_local_data(process_data):
     return process_data.get_hash_data()
 
 
+# 删除外网库与内网不一致的数据表单
+def delete_tb(path, local_client):
+    delete_tb_cfg = Json(path)
+    delete_tb_cfg.read_json_file()
+    tb_data = delete_tb_cfg.get_tb()
+    for tb_name in iter(tb_data):
+        local_client.deleta_key(tb_name)
+        print(f"{tb_name}清理成功")
+
+
 # 涉及数据删除确认
 def examine():
     examine_value = input('是否继续\n1.是\t2.否\n请选择:')
@@ -116,8 +126,7 @@ if __name__ == '__main__':
                 examine()
                 process_data = init_process(local_client, local_json)
                 local_data = get_local_data(process_data)
-                # 兼容永恒，清理db库
-                local_client.deleta_key('db')
+                delete_tb('../cfg/del_tb.json', local_client)
                 local_client.update(local_data)
                 print("数据已本地化成功，部分数据如下: ")
                 local_client.out_data()

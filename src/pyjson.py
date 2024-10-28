@@ -23,6 +23,11 @@ class Json:
         self.server_data = self.json_data['server']
         return self.server_data
 
+    # 获得delete表单配置
+    def get_tb(self):
+        self.tb_data = self.json_data['tb_name']
+        return self.tb_data
+
     # 打印Json文件内容
     def out_data(self):
         formatted_json = json.dumps(self.json_data, indent=4)
