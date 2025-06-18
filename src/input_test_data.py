@@ -1,7 +1,7 @@
 import redis
 
 # 创建 Redis 连接
-redis_client = redis.Redis(host='localhost', port=6379, db=3)
+redis_client = redis.Redis(host='localhost', port=6379, db=1)
 
 # 要存储的数据
 data = {

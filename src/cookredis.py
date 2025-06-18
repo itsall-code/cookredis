@@ -34,6 +34,8 @@ def get_client(json):
     client.create_connection()
     return client
 
+# 获取跨服Redis 连接
+#
 
 # 初始化数据处理器
 def init_process(client, json):
@@ -164,8 +166,15 @@ if __name__ == '__main__':
                             )
                     localWorkData = get_local_data(processWorkData)
                     localWorkClient.update(localWorkData)
+                    delete_tb('../cfg/del_tb.json', localWorkClient)
                 print("批量处理完成")
                 input('输入任意键回到菜单')
+            case '7':
+                clear()
+                cross_cfg_json = init_data('../cfg/cross_db_cfg.json')
+                print('跨服配置：')
+                print(cross_cfg_json.out_data())
+
             case '0':
                 door = 0
                 print('系统关闭成功')

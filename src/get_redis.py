@@ -33,7 +33,7 @@ class Get_redis:
             print(f"未知错误: {e}")
             return None
     
-    # 获取Account的Hash值
+    # 获取key的Hash值
     def get_data(self, primary_key):
         try:
             self.primary_key = primary_key
@@ -47,6 +47,10 @@ class Get_redis:
             print(f"获取数据失败: {e}")
             return {}
     
+    # 获取db的全部的key
+    def get_all_key(self):
+        self.all_keys = self.client.keys()
+
     # 输出获取的Hash，测试数据是否正确
     # 最多输出5条
     def out_data(self, max_items=5):
@@ -80,7 +84,7 @@ class Get_redis:
     def back_up(self, local_client, batch_size=1000):
         # 清库
         local_client.delete_db()
-        # 
+        
         keys = self.client.keys('*')
         total_keys = len(keys)
         print(f"开始备份，共 {total_keys} 个键")
