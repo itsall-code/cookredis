@@ -13,10 +13,16 @@ class Json:
             self.json_data = json.load(file)
         return self.json_data
 
-    # 获取redsi配置
+    # 获取redis配置
     def get_redis(self):
         self.redis_data = self.json_data['redis']
         return self.redis_data
+
+    # 获取cross_redis
+    def get_cross_redis(self):
+        self.local_cross_redis_data = self.json_data['local_cross']
+        self.source_cross_redis_data = self.json_data['source_cross']
+        return [self.local_cross_redis_data, self.source_cross_redis_data]
 
     # 获取serer配置
     def get_server(self):
