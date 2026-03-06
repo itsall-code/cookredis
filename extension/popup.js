@@ -64,7 +64,7 @@ async function ensureDefaultState() {
             db: 1
           },
           serverConfig: {
-            platform: "local",
+            platform: "1",
             group: "1",
             server: "S1",
             pre_login: "local_"
@@ -178,6 +178,9 @@ async function fillDefaults() {
   if (byId("hashName")) {
     byId("hashName").value = env.defaultHashName || "Account";
   }
+  if (byId("batchHashName")) {
+    byId("batchHashName").value = env.defaultHashName || "Account";;
+  }
   if (byId("viewHashName")) {
     byId("viewHashName").value = env.defaultHashName || "Account";
   }
@@ -250,24 +253,26 @@ async function localizeAccount() {
 async function batchLocalize() {
   try {
     const { env } = await getEnvSettings();
-    const hashName = byId("hashName").value.trim() || env.defaultHashName || "Account";
-    const sourceFields = linesToArray(byId("batchFields").value);
+    const hashName = byId("batchHashName").value.trim() || "acc";
 
-    if (!sourceFields.length) {
-      throw new Error("请至少输入一个账号 field");
-    }
+    appendLog(`开始对全表执行本地化: ${hashName}`);
 
-    const result = await apiFetch("/api/process/localize-batch", "POST", {
+    const result = await apiFetch("/api/process/localize-all-acc", "POST", {
       source: env.sourceRedis,
       target: env.targetRedis,
       hash_name: hashName,
-      source_fields: sourceFields,
+      source_fields: [],
       server: env.serverConfig
     });
 
-    appendLog((result.message || "批量本地化成功") + ` -> ${safePretty(result.data)}`, "ok");
+    const targets = Array.isArray(result.data) ? result.data : [];
+    appendLog(result.message || `全表本地化成功，共 ${targets.length} 个字段`, "ok");
+
+    if (targets.length) {
+      appendLog(`已生成 ${targets.length} 个目标字段，前 20 个：${targets.slice(0, 20).join(", ")}`);
+    }
   } catch (err) {
-    appendLog(`批量本地化失败: ${err.message}`, "error");
+    appendLog(`全表本地化失败: ${err.message}`, "error");
   }
 }
 

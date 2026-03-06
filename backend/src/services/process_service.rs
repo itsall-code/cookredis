@@ -25,7 +25,8 @@ pub async fn localize_single_account(req: &LocalizeAccountRequest) -> anyhow::Re
         })?;
 
     let mut value = msgpack::decode_to_json_value(&raw)?;
-    transform_value_recursive(
+
+    transform_root_value(
         &mut value,
         &req.server.platform,
         &req.server.group,
@@ -65,6 +66,72 @@ pub async fn localize_batch(req: &BatchLocalizeRequest) -> anyhow::Result<Vec<St
     Ok(targets)
 }
 
+pub async fn localize_all_acc(req: &BatchLocalizeRequest) -> anyhow::Result<Vec<String>> {
+    let fields = redis_service::list_hash_fields(&req.source, &req.hash_name)
+        .await
+        .with_context(|| format!("failed to list fields from hash {}", req.hash_name))?;
+
+    let mut targets = Vec::with_capacity(fields.len());
+
+    for field in fields {
+        let single = LocalizeAccountRequest {
+            source: req.source.clone(),
+            target: req.target.clone(),
+            hash_name: req.hash_name.clone(),
+            source_field: field.clone(),
+            target_field: Some(format!("{}{}", req.server.pre_login, field)),
+            server: req.server.clone(),
+        };
+
+        let target = localize_single_account(&single).await?;
+        targets.push(target);
+    }
+
+    Ok(targets)
+}
+
+fn transform_root_value(
+    value: &mut Value,
+    platform: &str,
+    group: &str,
+    server: &str,
+) -> anyhow::Result<()> {
+    patch_root_array_platform_group(value, platform, group)?;
+    transform_value_recursive(value, platform, group, server)
+}
+
+fn patch_root_array_platform_group(
+    value: &mut Value,
+    platform: &str,
+    group: &str,
+) -> anyhow::Result<()> {
+    let platform_num: i64 = platform.parse()?;
+    let group_num: i64 = group.parse()?;
+
+    if let Value::Array(arr) = value {
+        if patch_array_platform_group(arr, platform_num, group_num) {
+            return Ok(());
+        }
+
+        if let Some(Value::Array(inner)) = arr.get_mut(0) {
+            if patch_array_platform_group(inner, platform_num, group_num) {
+                return Ok(());
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn patch_array_platform_group(arr: &mut [Value], platform_num: i64, group_num: i64) -> bool {
+    if arr.len() >= 2 && arr[0].is_number() && arr[1].is_number() {
+        arr[0] = Value::from(platform_num);
+        arr[1] = Value::from(group_num);
+        return true;
+    }
+    false
+}
+
 fn transform_value_recursive(
     value: &mut Value,
     platform: &str,
@@ -82,7 +149,7 @@ fn transform_value_recursive(
             *s = out;
         }
         Value::Array(arr) => {
-            for item in arr {
+            for item in arr.iter_mut() {
                 transform_value_recursive(item, platform, group, server)?;
             }
         }
@@ -99,8 +166,8 @@ fn transform_value_recursive(
 
 fn replace_platform_like(input: &str, platform: &str) -> String {
     let patterns = [
-        r#"\"platform\":\"[^\"]+\""#,
-        r#"\"plat\":\"[^\"]+\""#,
+        r#""platform":"[^"]+""#,
+        r#""plat":"[^"]+""#,
         r#"platform=[^,}\]]+"#,
         r#"plat=[^,}\]]+"#,
     ];
@@ -131,8 +198,8 @@ fn replace_platform_like(input: &str, platform: &str) -> String {
 
 fn replace_group_like(input: &str, group: &str) -> String {
     let patterns = [
-        r#"\"group\":\"[^\"]+\""#,
-        r#"\"groupId\":\"[^\"]+\""#,
+        r#""group":"[^"]+""#,
+        r#""groupId":"[^"]+""#,
         r#"group=[^,}\]]+"#,
         r#"groupId=[^,}\]]+"#,
     ];
@@ -160,4 +227,3 @@ fn replace_group_like(input: &str, group: &str) -> String {
 
     output
 }
-

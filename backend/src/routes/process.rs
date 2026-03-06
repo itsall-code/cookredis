@@ -13,6 +13,7 @@ pub fn routes() -> Router {
     Router::new()
         .route("/api/process/localize-account", post(localize_account))
         .route("/api/process/localize-batch", post(localize_batch))
+        .route("/api/process/localize-all-acc", post(localize_all_acc))
 }
 
 async fn localize_account(
@@ -32,5 +33,19 @@ async fn localize_batch(
     Ok(Json(ApiResponse::ok_with_message(
         targets.clone(),
         format!("Localized {} accounts", targets.len()),
+    )))
+}
+
+async fn localize_all_acc(
+    Json(req): Json<BatchLocalizeRequest>,
+) -> Result<Json<ApiResponse<Vec<String>>>, AppError> {
+    let targets = process_service::localize_all_acc(&req).await?;
+    Ok(Json(ApiResponse::ok_with_message(
+        targets.clone(),
+        format!(
+            "Localized all fields in hash {} successfully, total {}",
+            req.hash_name,
+            targets.len()
+        ),
     )))
 }

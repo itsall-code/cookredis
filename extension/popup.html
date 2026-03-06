@@ -78,14 +78,15 @@
       </div>
 
       <div class="section snap-section">
-        <h2>4. 批量本地化</h2>
+        <h2>4. 全库 acc 表本地化</h2>
         <div class="row">
           <div class="col">
-            <label for="batchFields">账号字段（每行一个）</label>
-            <textarea id="batchFields"></textarea>
+            <label for="batchHashName">Hash 名</label>
+            <input id="batchHashName" type="text" />
           </div>
         </div>
-        <button id="batchLocalizeBtn" type="button">执行批量本地化</button>
+        <div class="small">自动读取 source Redis 中该 Hash 的全部字段，并写入 target Redis</div>
+        <button id="batchLocalizeBtn" type="button">执行全表本地化</button>
       </div>
 
       <div class="section snap-section">
