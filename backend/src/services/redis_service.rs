@@ -1,0 +1,178 @@
+use std::collections::HashMap;
+
+use anyhow::Context;
+use base64::{engine::general_purpose, Engine as _};
+use redis::{aio::MultiplexedConnection, AsyncCommands};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+use crate::{models::redis::RedisConfig, utils::msgpack};
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HashVisualizedResult {
+    pub hash_name: String,
+    pub field: String,
+    pub raw_base64: String,
+    pub raw_size: usize,
+    pub decoded_type: String,
+    pub decoded_json: Option<Value>,
+    pub decoded_text: Option<String>,
+}
+
+pub async fn create_connection(cfg: &RedisConfig) -> anyhow::Result<MultiplexedConnection> {
+    let url = if let Some(pass) = &cfg.password {
+        format!("redis://:{}@{}:{}/{}", pass, cfg.host, cfg.port, cfg.db)
+    } else {
+        format!("redis://{}:{}/{}", cfg.host, cfg.port, cfg.db)
+    };
+
+    let client = redis::Client::open(url).context("failed to create redis client")?;
+    let conn = client
+        .get_multiplexed_async_connection()
+        .await
+        .context("failed to connect redis")?;
+    Ok(conn)
+}
+
+pub async fn test_connection(cfg: &RedisConfig) -> anyhow::Result<()> {
+    let mut conn = create_connection(cfg).await?;
+    let pong: String = redis::cmd("PING").query_async(&mut conn).await?;
+    if pong != "PONG" {
+        anyhow::bail!("unexpected ping response: {}", pong);
+    }
+    Ok(())
+}
+
+pub async fn flushdb(cfg: &RedisConfig) -> anyhow::Result<()> {
+    let mut conn = create_connection(cfg).await?;
+    let _: () = redis::cmd("FLUSHDB").query_async(&mut conn).await?;
+    Ok(())
+}
+
+pub async fn delete_keys(cfg: &RedisConfig, keys: &[String]) -> anyhow::Result<usize> {
+    if keys.is_empty() {
+        return Ok(0);
+    }
+    let mut conn = create_connection(cfg).await?;
+    let deleted: usize = redis::cmd("DEL").arg(keys).query_async(&mut conn).await?;
+    Ok(deleted)
+}
+
+pub async fn backup_db(source: &RedisConfig, target: &RedisConfig) -> anyhow::Result<usize> {
+    let mut src = create_connection(source).await?;
+    let mut dst = create_connection(target).await?;
+
+    let _: () = redis::cmd("FLUSHDB").query_async(&mut dst).await?;
+
+    let keys: Vec<String> = redis::cmd("KEYS").arg("*").query_async(&mut src).await?;
+    let mut copied = 0usize;
+
+    for key in keys {
+        let dumped: Vec<u8> = redis::cmd("DUMP").arg(&key).query_async(&mut src).await?;
+        let _: () = redis::cmd("RESTORE")
+            .arg(&key)
+            .arg(0)
+            .arg(dumped)
+            .arg("REPLACE")
+            .query_async(&mut dst)
+            .await?;
+        copied += 1;
+    }
+
+    Ok(copied)
+}
+
+pub async fn list_hash_fields(cfg: &RedisConfig, hash_name: &str) -> anyhow::Result<Vec<String>> {
+    let mut conn = create_connection(cfg).await?;
+    let fields: Vec<String> = redis::cmd("HKEYS").arg(hash_name).query_async(&mut conn).await?;
+    Ok(fields)
+}
+
+pub async fn get_hash_field_bytes(
+    cfg: &RedisConfig,
+    hash_name: &str,
+    field: &str,
+) -> anyhow::Result<Vec<u8>> {
+    let mut conn = create_connection(cfg).await?;
+    let value: Option<Vec<u8>> = conn.hget(hash_name, field).await?;
+    match value {
+        Some(v) => Ok(v),
+        None => anyhow::bail!("field not found: {} in hash {}", field, hash_name),
+    }
+}
+
+pub async fn set_hash_field_bytes(
+    cfg: &RedisConfig,
+    hash_name: &str,
+    field: &str,
+    value: Vec<u8>,
+) -> anyhow::Result<()> {
+    let mut conn = create_connection(cfg).await?;
+    let _: () = conn.hset(hash_name, field, value).await?;
+    Ok(())
+}
+
+pub async fn get_hash_field_raw(
+    cfg: &RedisConfig,
+    hash_name: &str,
+    field: &str,
+) -> anyhow::Result<String> {
+    let bytes = get_hash_field_bytes(cfg, hash_name, field).await?;
+    Ok(general_purpose::STANDARD.encode(bytes))
+}
+
+pub async fn set_hash_field_raw(
+    cfg: &RedisConfig,
+    hash_name: &str,
+    field: &str,
+    base64_value: &str,
+) -> anyhow::Result<()> {
+    let bytes = general_purpose::STANDARD
+        .decode(base64_value)
+        .context("invalid base64_value")?;
+    set_hash_field_bytes(cfg, hash_name, field, bytes).await
+}
+
+pub async fn get_hash_field_visualized(
+    cfg: &RedisConfig,
+    hash_name: &str,
+    field: &str,
+) -> anyhow::Result<HashVisualizedResult> {
+    let bytes = get_hash_field_bytes(cfg, hash_name, field).await?;
+    let raw_base64 = general_purpose::STANDARD.encode(&bytes);
+
+    if let Ok(json_value) = msgpack::decode_to_json_value(&bytes) {
+        return Ok(HashVisualizedResult {
+            hash_name: hash_name.to_string(),
+            field: field.to_string(),
+            raw_base64,
+            raw_size: bytes.len(),
+            decoded_type: "msgpack-json".to_string(),
+            decoded_json: Some(json_value),
+            decoded_text: None,
+        });
+    }
+
+    if let Ok(text) = String::from_utf8(bytes.clone()) {
+        return Ok(HashVisualizedResult {
+            hash_name: hash_name.to_string(),
+            field: field.to_string(),
+            raw_base64,
+            raw_size: bytes.len(),
+            decoded_type: "utf8-text".to_string(),
+            decoded_json: None,
+            decoded_text: Some(text),
+        });
+    }
+
+    Ok(HashVisualizedResult {
+        hash_name: hash_name.to_string(),
+        field: field.to_string(),
+        raw_base64,
+        raw_size: bytes.len(),
+        decoded_type: "binary".to_string(),
+        decoded_json: None,
+        decoded_text: None,
+    })
+}
+
