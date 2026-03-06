@@ -15,6 +15,12 @@ def init_data(path):
     return json
 
 
+# 初始化cross_redis_cfg
+def init_cross_data(cross_db_cfg_json):
+    cross_db_cfg_json.read_json_file()
+    [local_cross_cfg, source_cross_cfg] = cross_db_cfg_json.get_cross_redis()
+    return [local_cross_cfg, source_cross_cfg]
+
 # 初始化批量处理流水线
 def init_pipeline(path):
     pipeline = Pipeline(path)
@@ -34,8 +40,50 @@ def get_client(json):
     client.create_connection()
     return client
 
+
 # 获取跨服Redis 连接
-#
+def get_cross_client(local_cross_cfg, source_cross_cfg):
+    local_cross_client = get_redis.Get_redis(
+            local_cross_cfg['host'],
+            local_cross_cfg['port'],
+            local_cross_cfg['db'],
+            local_cross_cfg['password']
+    )
+    local_cross_client.create_connection()
+
+    source_cross_client = get_redis.Get_redis(
+            source_cross_cfg['host'],
+            source_cross_cfg['port'],
+            source_cross_cfg['db'],
+            source_cross_cfg['password']
+    )
+    source_cross_client.create_connection() 
+
+    return [local_cross_client, source_cross_client]
+
+
+# 处理跨服数据
+def cross_process(path):
+    cross_db_cfg_json = Json(path)
+    [local_cross_cfg, source_cross_cfg] = init_cross_data(cross_db_cfg_json)
+    [local_cross_client , source_cross_client] = get_cross_client(local_cross_cfg, source_cross_cfg)
+    clear()
+    print('检查跨服配置是否一致')
+    cross_db_cfg_json.out_data()
+    print('如果不一致，请修改cfg目录下的cross_db_cfg.json')
+    choose = input(f"\n1.删除本服跨服库\n2.导入跨服库\n3.关闭")
+    match choose:
+        case '1':
+            clear()
+            local_cross_client.delete_db()
+        case '2':
+            clear()
+            local_cross_client.delete_db()
+            source_cross_client.back_up(local_cross_client, 1000)
+            delete_tb('../cfg/del_tb.json', local_cross_client)
+        case _:
+            return 0
+
 
 # 初始化数据处理器
 def init_process(client, json):
@@ -171,10 +219,8 @@ if __name__ == '__main__':
                 input('输入任意键回到菜单')
             case '7':
                 clear()
-                cross_cfg_json = init_data('../cfg/cross_db_cfg.json')
-                print('跨服配置：')
-                print(cross_cfg_json.out_data())
-
+                print('跨服数据处理')
+                cross_process('../cfg/cross_db_cfg.json') 
             case '0':
                 door = 0
                 print('系统关闭成功')
