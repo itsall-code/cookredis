@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>CookRedis 设置</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <h1>CookRedis 插件设置</h1>
+
+    <div class="section">
+      <h2>环境管理</h2>
+      <div class="row">
+        <div class="col">
+          <label for="envSelect">当前环境</label>
+          <select id="envSelect"></select>
+        </div>
+        <div class="col">
+          <label for="newEnvName">新环境名</label>
+          <input id="newEnvName" type="text" placeholder="dev / test / prod" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col"><button id="addEnvBtn">新增环境</button></div>
+        <div class="col"><button id="deleteEnvBtn" class="danger">删除当前环境</button></div>
+        <div class="col"><button id="exportBtn" class="secondary">导出配置</button></div>
+        <div class="col"><button id="importBtn" class="secondary">导入配置</button></div>
+      </div>
+      <input id="importFile" type="file" accept="application/json" style="display:none;" />
+    </div>
+
+    <div class="section">
+      <h2>后端接口</h2>
+      <div class="row"><div class="col"><label for="apiBase">API Base URL</label><input id="apiBase" type="text" /></div></div>
+    </div>
+
+    <div class="section">
+      <h2>源 Redis</h2>
+      <div class="row">
+        <div class="col"><label for="sourceHost">Host</label><input id="sourceHost" type="text" /></div>
+        <div class="col"><label for="sourcePort">Port</label><input id="sourcePort" type="number" /></div>
+        <div class="col"><label for="sourceDb">DB</label><input id="sourceDb" type="number" /></div>
+      </div>
+      <div class="row"><div class="col"><label for="sourcePassword">Password</label><input id="sourcePassword" type="text" placeholder="留空表示 null" /></div></div>
+    </div>
+
+    <div class="section">
+      <h2>目标 Redis</h2>
+      <div class="row">
+        <div class="col"><label for="targetHost">Host</label><input id="targetHost" type="text" /></div>
+        <div class="col"><label for="targetPort">Port</label><input id="targetPort" type="number" /></div>
+        <div class="col"><label for="targetDb">DB</label><input id="targetDb" type="number" /></div>
+      </div>
+      <div class="row"><div class="col"><label for="targetPassword">Password</label><input id="targetPassword" type="text" placeholder="留空表示 null" /></div></div>
+    </div>
+
+    <div class="section">
+      <h2>本地化配置</h2>
+      <div class="row">
+        <div class="col"><label for="platform">Platform</label><input id="platform" type="text" /></div>
+        <div class="col"><label for="group">Group</label><input id="group" type="text" /></div>
+      </div>
+      <div class="row">
+        <div class="col"><label for="server">Server</label><input id="server" type="text" /></div>
+        <div class="col"><label for="preLogin">Pre Login</label><input id="preLogin" type="text" /></div>
+      </div>
+      <div class="row"><div class="col"><label for="defaultHashName">Default Hash Name</label><input id="defaultHashName" type="text" /></div></div>
+    </div>
+
+    <div class="section">
+      <h2>默认删除配置</h2>
+      <div class="row"><div class="col"><label for="defaultTables">默认 tables（每行一个）</label><textarea id="defaultTables"></textarea></div></div>
+      <div class="row"><div class="col"><label for="defaultDeleteKeys">默认 keys（每行一个）</label><textarea id="defaultDeleteKeys"></textarea></div></div>
+    </div>
+
+    <div class="section">
+      <div class="row">
+        <div class="col"><button id="saveBtn">保存设置</button></div>
+        <div class="col"><button id="testHealthBtn" class="secondary">测试后端健康检查</button></div>
+      </div>
+      <div id="status" class="status">等待操作</div>
+    </div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,397 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.popup-body {
+  width: 500px;
+  height: 760px;
+  overflow: hidden;
+}
+
+.popup-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: #f3f4f6;
+}
+
+.popup-header {
+  flex: 0 0 auto;
+  padding: 12px 14px 8px;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.popup-header h1 {
+  font-size: 18px;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+.log-panel {
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #f3f4f6;
+  padding: 10px 14px 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.log-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.log-panel-header h2 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.status {
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #eef2ff;
+  color: #3730a3;
+  word-break: break-word;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.status.ok {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.status.error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.log {
+  background: #0b1222;
+  color: #f9fafb;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  min-height: 120px;
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.log::-webkit-scrollbar {
+  width: 8px;
+}
+
+.log::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+}
+
+.log-line {
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.log-line.info {
+  color: #dbeafe;
+}
+
+.log-line.ok {
+  color: #4ade80;
+}
+
+.log-line.error {
+  color: #f87171;
+}
+
+.popup-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px;
+  padding-top: 12px;
+  padding-bottom: 24px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 114, 128, 0.45) transparent;
+}
+
+.popup-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.popup-scroll::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.4);
+  border-radius: 999px;
+}
+
+.popup-scroll::after {
+  content: "";
+  display: block;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+h2 {
+  font-size: 15px;
+  margin: 0 0 10px;
+  line-height: 1.35;
+  color: #111827;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.col {
+  flex: 1;
+  min-width: 0;
+}
+
+.small {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+  line-height: 1.45;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  color: #4b5563;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+
+input,
+textarea,
+select,
+button {
+  width: 100%;
+  font-size: 13px;
+  border-radius: 10px;
+  font-family: inherit;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid #d1d5db;
+  padding: 9px 12px;
+  background: #fff;
+  color: #111827;
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 74px;
+  max-height: 180px;
+  line-height: 1.45;
+}
+
+select {
+  appearance: auto;
+}
+
+button {
+  border: none;
+  padding: 11px 12px;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  transition: transform 0.08s ease, opacity 0.15s ease, background 0.15s ease;
+}
+
+button:hover {
+  opacity: 0.96;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button.secondary {
+  background: #6b7280;
+}
+
+button.danger {
+  background: #dc2626;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.small-btn {
+  width: auto;
+  min-width: 88px;
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.link-row {
+  display: flex;
+  gap: 8px;
+}
+
+.link-row a {
+  font-size: 12px;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.viewer {
+  background: #0b1222;
+  color: #dbeafe;
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 24px;
+  max-height: 240px;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+.viewer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.viewer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+}
+
+.tag {
+  display: inline-block;
+  background: #e5e7eb;
+  color: #374151;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+.collapsible-section .section-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.collapsible-section .section-topbar h2 {
+  margin: 0;
+}
+
+.section-summary {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.45;
+}
+
+.section-body {
+  overflow: hidden;
+  max-height: 1200px;
+  opacity: 1;
+  transition:
+    max-height 0.28s ease,
+    opacity 0.2s ease,
+    margin-top 0.2s ease;
+  margin-top: 12px;
+}
+
+.section-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  pointer-events: none;
+}
+
+.field-action-row {
+  align-items: flex-end;
+}
+
+.field-action-btn-col {
+  flex: 1;
+}
+
+.field-action-input-col {
+  flex: 1;
+}
+
+#listFieldsBtn {
+  margin-top: 20px;
+}
+
+#fieldList[style*="display:none"] {
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border: 0;
+}
+
+@media (max-height: 760px) {
+  .popup-body {
+    height: 720px;
+  }
+
+  .log {
+    max-height: 180px;
+  }
+
+  .viewer {
+    max-height: 200px;
+  }
+}

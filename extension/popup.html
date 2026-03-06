@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>CookRedis 测试工具</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="popup-body">
+  <div class="popup-shell">
+    <div class="popup-header">
+      <h1>Cook-Redis 测试工具</h1>
+      <div class="link-row">
+        <a href="options.html" target="_blank">系统设置</a>
+        &emsp;&emsp;&emsp;
+        <a href="options.html" target="_blank">系统说明</a>
+      </div>
+    </div>
+
+    <div class="log-panel">
+      <div class="log-panel-header">
+        <div>
+          <h2>运行日志</h2>
+          <div id="backendStatus" class="status">后端状态：未检查</div>
+        </div>
+        <button id="clearLogBtn" class="secondary small-btn" type="button">清空日志</button>
+      </div>
+      <div id="log" class="log"></div>
+    </div>
+
+    <div class="popup-scroll" id="popupScroll">
+      <div class="section snap-section">
+        <div class="row">
+          <div class="col">
+            <label for="envName">环境</label>
+            <select id="envName"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section snap-section">
+        <h2>1. 测试 Redis 连接</h2>
+        <div class="row">
+          <div class="col">
+            <select id="testTarget">
+              <option value="source">源 Redis</option>
+              <option value="target">目标 Redis</option>
+            </select>
+          </div>
+        </div>
+        <button id="testRedisBtn" type="button">测试连接</button>
+      </div>
+
+      <div class="section snap-section">
+        <h2>2. 备份数据库</h2>
+        <div class="small">源库 -> 目标库，会覆盖目标库</div>
+        <button id="backupBtn" type="button">执行备份</button>
+      </div>
+
+      <div class="section snap-section">
+        <h2>3. 单账号本地化</h2>
+        <div class="row">
+          <div class="col">
+            <label for="hashName">Hash 名</label>
+            <input id="hashName" type="text" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="sourceField">源账号 Field</label>
+            <input id="sourceField" type="text" />
+          </div>
+          <div class="col">
+            <label for="targetField">目标账号 Field</label>
+            <input id="targetField" type="text" placeholder="留空自动生成" />
+          </div>
+        </div>
+        <button id="localizeBtn" type="button">执行本地化</button>
+      </div>
+
+      <div class="section snap-section">
+        <h2>4. 批量本地化</h2>
+        <div class="row">
+          <div class="col">
+            <label for="batchFields">账号字段（每行一个）</label>
+            <textarea id="batchFields"></textarea>
+          </div>
+        </div>
+        <button id="batchLocalizeBtn" type="button">执行批量本地化</button>
+      </div>
+
+      <div class="section snap-section">
+        <h2>5. 删除指定 Keys / Tables</h2>
+        <div class="row">
+          <div class="col">
+            <label for="deleteKeys">Keys（每行一个）</label>
+            <textarea id="deleteKeys"></textarea>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="deleteTables">Tables（每行一个）</label>
+            <textarea id="deleteTables"></textarea>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button id="deleteKeysBtn" class="danger" type="button">删除 Keys</button>
+          </div>
+          <div class="col">
+            <button id="deleteTablesBtn" class="danger" type="button">删除 Tables</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section snap-section collapsible-section" id="viewerSection">
+        <div class="section-topbar">
+          <h2>6. 读取 Hash 字段并可视化</h2>
+          <button id="toggleViewerSectionBtn" class="secondary small-btn" type="button">展开</button>
+        </div>
+
+        <div class="section-summary">
+          按需展开，查看 Hash 字段列表与解码结果。
+        </div>
+
+        <div class="section-body collapsed" id="viewerSectionBody">
+          <div class="row">
+            <div class="col">
+              <label for="viewRedisTarget">读取来源</label>
+              <select id="viewRedisTarget">
+                <option value="source">source Redis</option>
+                <option value="target">target Redis</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label for="viewHashName">Hash 名</label>
+              <input id="viewHashName" type="text" />
+            </div>
+          </div>
+
+          <div class="row field-action-row">
+            <div class="col field-action-btn-col">
+              <button id="listFieldsBtn" class="secondary" type="button">列出字段</button>
+            </div>
+            <div class="col field-action-input-col">
+              <label for="viewField">Field</label>
+              <input id="viewField" type="text" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <button id="viewFieldBtn" type="button">读取并可视化</button>
+            </div>
+          </div>
+
+          <div id="fieldList" class="viewer" style="display:none;"></div>
+          <div id="fieldViewer" class="viewer" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <div class="section snap-section">
+        <h2>7. 清空目标 DB</h2>
+        <div class="small">危险操作，需要二次确认</div>
+        <button id="flushBtn" class="danger" type="button">清空目标 DB</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
